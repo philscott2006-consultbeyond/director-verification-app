@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% set title = "Admin login" %}
+
+{% block content %}
+<h2>ACSP admin login</h2>
+<p>Only authorised ACSP personnel should access submissions.</p>
+<form method="post" class="form-grid">
+  <label>
+    Admin password
+    <input type="password" name="password" required />
+  </label>
+  <button type="submit" class="button primary">Sign in</button>
+</form>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% set title = "Welcome" %}
+
+{% block content %}
+<section class="intro">
+  <h2>Verify a director with your ACSP</h2>
+  <p>
+    Each director must complete identity verification before Companies House filings. Use this secure portal to submit
+    required information, upload supporting documents, and capture a verification photo or video.
+  </p>
+  <div class="cta-grid">
+    <a class="button primary" href="{{ url_for('main.register') }}">Create a new director profile</a>
+    <a class="button" href="{{ url_for('main.start_existing') }}">I already have a user ID</a>
+    <a class="button secondary" href="{{ url_for('main.govuk_verify') }}" target="_blank" rel="noopener">
+      Go to GOV.UK Verify instead
+    </a>
+  </div>
+</section>
+
+<section class="document-guidance">
+  <h3>Acceptable documents</h3>
+  <p>Provide either two Group A documents or one Group A and one Group B document.</p>
+  <div class="document-columns">
+    <div>
+      <h4>Group A – Photographic ID</h4>
+      <ul>
+        {% for item in group_a %}
+          <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h4>Group B – Proof of address</h4>
+      <ul>
+        {% for item in group_b %}
+          <li>{{ item }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="gdpr">
+  <h3>How we handle your data</h3>
+  <ul>
+    <li>All files are encrypted at rest in secure storage controlled by your ACSP.</li>
+    <li>Information is used solely for Companies House director verification and AML compliance.</li>
+    <li>You can request deletion or correction at any time by contacting your ACSP representative.</li>
+  </ul>
+</section>
+{% endblock %}

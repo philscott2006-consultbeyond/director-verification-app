@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% set title = "Admin dashboard" %}
+
+{% block content %}
+<h2>Director submissions</h2>
+<table>
+  <thead>
+    <tr>
+      <th>User ID</th>
+      <th>Director name</th>
+      <th>Email</th>
+      <th>Verification code</th>
+      <th>Documents</th>
+      <th>Media</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in submissions %}
+      <tr>
+        <td>{{ item.user['id'] }}</td>
+        <td>{{ item.user['full_name'] or 'Pending' }}</td>
+        <td>{{ item.user['email'] }}</td>
+        <td>{{ item.user['verification_code'] }}</td>
+        <td>{{ item.doc_count }}</td>
+        <td>{{ item.media_count }}</td>
+        <td>
+          <a class="button" href="{{ url_for('main.admin_download', user_id=item.user['id']) }}">Download package</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
