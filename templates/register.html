@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% set title = "Create director profile" %}
+
+{% block content %}
+<h2>Create a director profile</h2>
+<p>Provide an email address so we can send you your secure user ID and verification code.</p>
+<form method="post" class="form-grid">
+  <label>
+    Full name (optional at this stage)
+    <input type="text" name="full_name" autocomplete="name" />
+  </label>
+  <label>
+    Email address
+    <input type="email" name="email" required autocomplete="email" />
+  </label>
+  <button type="submit" class="button primary">Generate user ID</button>
+</form>
+{% endblock %}

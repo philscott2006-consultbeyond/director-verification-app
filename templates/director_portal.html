@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% set title = "Director portal" %}
+
+{% block content %}
+<section class="director-header">
+  <h2>Director verification workspace</h2>
+  <p>
+    User ID: <strong>{{ user['id'] }}</strong> &middot; Verification code: <strong>{{ user['verification_code'] }}</strong>
+  </p>
+  {% if doc_requirements_met %}
+    <div class="status success">Required document combination received.</div>
+  {% else %}
+    <div class="status warning">Upload either two Group A documents or one Group A plus one Group B document.</div>
+  {% endif %}
+</section>
+
+<form method="post" enctype="multipart/form-data" class="director-form">
+  <fieldset>
+    <legend>Personal details</legend>
+    <div class="field-grid">
+      <label>Full name
+        <input type="text" name="full_name" value="{{ user['full_name'] or '' }}" required />
+      </label>
+      <label>Former names (if any)
+        <input type="text" name="former_names" value="{{ user['former_names'] or '' }}" />
+      </label>
+      <label>Date of birth
+        <input type="date" name="date_of_birth" value="{{ user['date_of_birth'] or '' }}" required />
+      </label>
+      <label>Email address
+        <input type="email" name="email" value="{{ user['email'] or '' }}" required />
+      </label>
+      <label>Home address
+        <textarea name="home_address" rows="2" required>{{ user['home_address'] or '' }}</textarea>
+      </label>
+      <label>Address history (last 12 months)
+        <textarea name="address_history" rows="3" required>{{ user['address_history'] or '' }}</textarea>
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Upload identification documents</legend>
+    <p>Select the document group and type for each file. Submit two documents in total: either two from Group A, or one from Group A and one from Group B.</p>
+    <div class="document-upload-grid">
+      {% for idx in range(1, 3) %}
+        <div class="document-card">
+          <h4>Document {{ idx }}</h4>
+          <label>Document group
+            <select name="document_group_{{ idx }}">
+              <option value="">-- select --</option>
+              <option value="A">Group A &ndash; photographic ID</option>
+              <option value="B">Group B &ndash; proof of address</option>
+            </select>
+          </label>
+          <label>Document type
+            <input type="text" name="document_type_{{ idx }}" placeholder="e.g. Passport" />
+          </label>
+          <label>Upload file
+            <input type="file" name="document_file_{{ idx }}" accept="image/*,application/pdf" />
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+    <p class="document-help">
+      Group A options include: {{ group_a | join(', ') }}. Group B options include: {{ group_b | join(', ') }}.
+    </p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Capture verification photo or video</legend>
+    <p>Record a brief selfie video or capture a photo holding one of your IDs. Ensure the ID text is legible.</p>
+    <div class="selfie-options">
+      <label><input type="radio" name="selfie_mode" value="photo" checked /> Upload a photo</label>
+      <label><input type="radio" name="selfie_mode" value="video" /> Upload a selfie video</label>
+      <label><input type="radio" name="selfie_mode" value="capture" /> Capture a photo with your camera</label>
+    </div>
+    <div class="selfie-upload">
+      <input type="file" name="selfie_file" accept="image/*,video/*" capture="user" />
+    </div>
+    <div class="selfie-capture" hidden>
+      <div class="camera-container">
+        <video id="selfie-video" autoplay playsinline></video>
+        <div class="overlay-frame">
+          <span>Align your face and ID within the frame</span>
+        </div>
+      </div>
+      <div class="capture-controls">
+        <button type="button" id="start-camera" class="button">Start camera</button>
+        <button type="button" id="capture-photo" class="button secondary">Capture still</button>
+        <button type="button" id="record-video" class="button secondary">Record video</button>
+        <button type="button" id="stop-recording" class="button secondary" disabled>Stop recording</button>
+      </div>
+      <canvas id="selfie-canvas" hidden></canvas>
+      <video id="recorded-preview" controls hidden loop></video>
+      <input type="hidden" name="selfie_capture_data" id="selfie-capture-data" />
+      <input type="hidden" name="selfie_video_data" id="selfie-video-data" />
+      <p class="small-print">Captured media is encrypted immediately once submitted.</p>
+      <p class="small-print">Selfie videos recorded here are limited to 30 seconds per clip.</p>
+    </div>
+  </fieldset>
+
+  <button type="submit" class="button primary">Save and upload securely</button>
+</form>
+
+<section class="uploads-list">
+  <h3>Submitted files</h3>
+  {% if documents %}
+    <table>
+      <thead>
+        <tr>
+          <th>Filename</th>
+          <th>Type</th>
+          <th>Group</th>
+          <th>Uploaded at</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for doc in documents %}
+          <tr>
+            <td>{{ doc['original_filename'] }}</td>
+            <td>{{ doc['document_type'] }}</td>
+            <td>{{ doc['document_group'] }}</td>
+            <td>{{ doc['uploaded_at'] }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No documents uploaded yet.</p>
+  {% endif %}
+
+  <h4>Verification media</h4>
+  {% if media_entries %}
+    <ul>
+      {% for media in media_entries %}
+        <li>{{ media['original_filename'] }} ({{ media['media_type'] }}) &ndash; {{ media['uploaded_at'] }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No selfie photo or video uploaded yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='selfie.js') }}" defer></script>
+{% endblock %}

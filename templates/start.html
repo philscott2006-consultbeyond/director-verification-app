@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% set title = "Access your portal" %}
+
+{% block content %}
+<h2>Access your director portal</h2>
+<p>Enter the user ID provided by your ACSP to continue uploading your verification evidence.</p>
+<form method="post" class="form-grid">
+  <label>
+    User ID
+    <input type="text" name="user_id" required autocomplete="off" />
+  </label>
+  <button type="submit" class="button primary">Continue</button>
+</form>
+{% endblock %}
