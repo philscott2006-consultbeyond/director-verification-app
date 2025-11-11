@@ -8,7 +8,7 @@ media while the ACSP reviews and exports encrypted submissions.
 
 - Self-service registration that issues a unique director user ID and verification code.
 - Guided upload workflow that enforces Companies House document rules (two Group A, or one Group A plus one Group B).
-- Webcam capture overlay for selfie photos plus in-browser selfie video recording, alongside standard upload options.
+- Webcam capture overlay for selfie photos, with the option to upload a photo or video instead.
 - Encrypted file storage using Fernet symmetric encryption with metadata per upload.
 - Admin console for ACSP staff to review submissions and download all artefacts as a zip package.
 - GDPR-friendly messaging, contact guidance, and optional link to the GOV.UK identity verification service.
@@ -69,4 +69,4 @@ Directors can choose to verify directly through GOV.UK by using the "Go to GOV.U
 
 - The SQLite database schema is created automatically when the app starts.
 - Uploaded files are grouped by user ID in the storage directory with encrypted contents and recorded metadata.
-- The `selfie.js` helper handles live camera capture and stores inline PNG photos or WebM videos for secure upload.
+- The `selfie.js` helper handles live camera capture and stores an inline PNG for secure upload.

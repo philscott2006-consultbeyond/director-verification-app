@@ -3,11 +3,9 @@ import json
 import secrets
 import uuid
 import zipfile
-from base64 import b64decode
 from datetime import datetime
-from io import BytesIO
-from pathlib import Path
 from typing import List
+from pathlib import Path
 
 from flask import (
     Blueprint,
@@ -21,8 +19,6 @@ from flask import (
     session,
     url_for,
 )
-from werkzeug.datastructures import FileStorage
-from werkzeug.exceptions import RequestEntityTooLarge
 
 from .constants import GROUP_A_DOCUMENTS, GROUP_B_DOCUMENTS
 from .database import close_db, get_db
@@ -105,28 +101,12 @@ def _get_user_or_404(user_id):
     return user
 
 
-@bp.app_errorhandler(RequestEntityTooLarge)
-def handle_large_upload(_error):
-    flash(
-        "The files selected exceed the 50 MB encrypted upload limit. Reduce the file size or contact the ACSP for support.",
-        "danger",
-    )
-    response = redirect(request.referrer or url_for("main.index"))
-    response.status_code = 303
-    return response
-
-
 def _validate_document_mix(total_docs: List[dict]) -> bool:
-    """Return True only when exactly two documents meet CH combination rules."""
-
-    if len(total_docs) != 2:
-        return False
-
     group_a = sum(1 for doc in total_docs if doc["document_group"] == "A")
     group_b = sum(1 for doc in total_docs if doc["document_group"] == "B")
-    if group_a == 2:
+    if group_a >= 2:
         return True
-    if group_a == 1 and group_b == 1:
+    if group_a >= 1 and group_b >= 1:
         return True
     return False
 
@@ -167,7 +147,7 @@ def director_portal(user_id):
         )
 
         pending_documents = []
-        for idx in range(1, 3):
+        for idx in range(1, 4):
             file_field = f"document_file_{idx}"
             doc_file = request.files.get(file_field)
             if not doc_file or not doc_file.filename:
@@ -194,27 +174,21 @@ def director_portal(user_id):
         selfie_mode = request.form.get("selfie_mode")
         selfie_upload = request.files.get("selfie_file")
         selfie_capture_data = request.form.get("selfie_capture_data")
-        selfie_video_data = request.form.get("selfie_video_data")
 
         if selfie_capture_data:
             header, _, b64data = selfie_capture_data.partition(",")
             if b64data:
-                data = b64decode(b64data)
+                import base64
+
+                data = base64.b64decode(b64data)
+                from werkzeug.datastructures import FileStorage
+                from io import BytesIO
+
                 selfie_upload = FileStorage(
                     stream=BytesIO(data),
                     filename="selfie_capture.png",
                     content_type="image/png",
                 )
-        elif selfie_video_data:
-            header, _, b64data = selfie_video_data.partition(",")
-            if b64data:
-                data = b64decode(b64data)
-                selfie_upload = FileStorage(
-                    stream=BytesIO(data),
-                    filename="selfie_capture.webm",
-                    content_type="video/webm",
-                )
-                selfie_mode = "video"
         pending_selfie = None
         if selfie_upload and selfie_upload.filename:
             media_type = "video" if (selfie_mode == "video" or selfie_upload.mimetype.startswith("video")) else "photo"
@@ -231,16 +205,9 @@ def director_portal(user_id):
         combined = [dict(row) for row in existing_docs]
         combined.extend({"document_group": doc["document_group"]} for doc in pending_documents)
 
-        if len(combined) > 2:
+        if combined and not _validate_document_mix(combined):
             flash(
-                "Only two identification documents can be stored. Remove an existing upload with your ACSP before adding new files.",
-                "danger",
-            )
-            return redirect(url_for("main.director_portal", user_id=user_id))
-
-        if len(combined) == 2 and not _validate_document_mix(combined):
-            flash(
-                "Provide either two Group A documents or one Group A plus one Group B document.",
+                "Uploads must include either two Group A documents or one Group A and one Group B document.",
                 "danger",
             )
             return redirect(url_for("main.director_portal", user_id=user_id))

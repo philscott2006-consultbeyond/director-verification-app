@@ -16,7 +16,7 @@ class Config:
     UPLOAD_FOLDER: str = os.getenv("UPLOAD_FOLDER", os.path.join("storage"))
     ENCRYPTION_KEY: Optional[str] = os.getenv("ENCRYPTION_KEY")
 
-    MAX_CONTENT_LENGTH: int = 50 * 1024 * 1024  # 50 MB limit per request
+    MAX_CONTENT_LENGTH: int = 25 * 1024 * 1024  # 25 MB limit per request
     SESSION_COOKIE_HTTPONLY: bool = True
     SESSION_COOKIE_SECURE: bool = False  # set True in production with HTTPS
     SESSION_COOKIE_SAMESITE: str = "Lax"

@@ -41,9 +41,9 @@
 
   <fieldset>
     <legend>Upload identification documents</legend>
-    <p>Select the document group and type for each file. Submit two documents in total: either two from Group A, or one from Group A and one from Group B.</p>
+    <p>Select the document group and type for each file. You can submit up to three files in one go.</p>
     <div class="document-upload-grid">
-      {% for idx in range(1, 3) %}
+      {% for idx in range(1, 4) %}
         <div class="document-card">
           <h4>Document {{ idx }}</h4>
           <label>Document group
@@ -88,15 +88,10 @@
       <div class="capture-controls">
         <button type="button" id="start-camera" class="button">Start camera</button>
         <button type="button" id="capture-photo" class="button secondary">Capture still</button>
-        <button type="button" id="record-video" class="button secondary">Record video</button>
-        <button type="button" id="stop-recording" class="button secondary" disabled>Stop recording</button>
       </div>
       <canvas id="selfie-canvas" hidden></canvas>
-      <video id="recorded-preview" controls hidden loop></video>
       <input type="hidden" name="selfie_capture_data" id="selfie-capture-data" />
-      <input type="hidden" name="selfie_video_data" id="selfie-video-data" />
-      <p class="small-print">Captured media is encrypted immediately once submitted.</p>
-      <p class="small-print">Selfie videos recorded here are limited to 30 seconds per clip.</p>
+      <p class="small-print">Captured images are encrypted immediately once uploaded.</p>
     </div>
   </fieldset>
 
